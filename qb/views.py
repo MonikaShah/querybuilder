@@ -43,12 +43,15 @@ def index(request):
     school_selected = None
     schcd_selected = None
     schcd = 0
-    vcode = 0
     dcd = 0
     bcd =0
     vcd=0
-    vdd =0
-    toal_p =0
+    toal_popu =0
+    tot_m = 0
+    tot_f = 0
+    tot_work_f = 0
+    tot_work_m =0
+    
     
     num_school = School1617Codes.objects.all().count()
     # schoolgen = SchoolGeneral1617.objects.all()
@@ -64,7 +67,7 @@ def index(request):
         subdistrict_selected = request.POST.get("subdist_select")
         village_selected = request.POST.get("village_select")
         school_selected = request.POST.get("school_select")
-        # vdd = request.POST.get("vilcod")
+        vilcod = request.POST.get("vilcod")
         # tot_p = cursor.callproc('tot_p',[vdd and tot_p])
         
         
@@ -84,16 +87,20 @@ def index(request):
             'subdistrict_selected':subdistrict_selected,
             'village_selected':village_selected,
             'school_selected':school_selected,
-            # 'value1':vdd,
+            'vilcod':vilcod,
                   
         
             'dcd':School1617Codes.objects.values_list('district_code',flat=True).get(school_name=school_selected),
             'bcd':School1617Codes.objects.values_list('block_code',flat=True).get(school_name=school_selected),
             'vcd':School1617Codes.objects.values_list('village_code',flat=True).get(school_name=school_selected),               
             'schcd':School1617Codes.objects.values_list('school_code',flat=True).get(school_name=school_selected),
-            'tot_p':"vcd",
-            # 'tot_p': cursor.callproc('tot_p',[vcd and tot_p]),
-            # 'tot_p': MahaDdw.objects.filter(census_2011code='value1').count(),
+            
+            
+            'tot_popu':MahaDdw.objects.values_list('tot_p',flat=True).get(census_2011code=vilcod),
+            'tot_m':MahaDdw.objects.values_list('tot_m',flat=True).get(census_2011code=vilcod),
+            'tot_f':MahaDdw.objects.values_list('tot_f',flat=True).get(census_2011code=vilcod),
+            'tot_work_m':MahaDdw.objects.values_list('tot_work_m',flat=True).get(census_2011code=vilcod),
+            'tot_work_f':MahaDdw.objects.values_list('tot_work_f',flat=True).get(census_2011code=vilcod),
            
 
             # 'vdd':School1617Codes.objects.get_queryset
