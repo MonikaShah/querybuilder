@@ -1,0 +1,569 @@
+{% extends 'school_dash/base.html' %}
+{% load static%}
+{% block content %}
+<style>
+
+.border {
+    padding: 6px 8px;
+    border-style: groove;
+    border-radius: 5px;
+    margin:20px;
+}
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+.table{
+  border-collapse: collapse;
+  padding: 50px;
+  font-weight: bold;
+
+  
+  /* background:rgba(191, 149, 233, 0.473); */
+
+}
+
+/* css to customize Leaflet default styles  */
+.leaflet-popup-content-wrapper {
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+}
+
+.leaflet-popup-content{
+    font-weight: bold;
+}
+
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% block title %}<title>Local Library - Maharashtra Schools</title>{% endblock %}
+</head>
+<body>
+  {% block sidebar %}<!-- insert default navigation text for every page -->{% endblock %}
+
+  <h1>Maharashtra School Home Page</h1>
+  <p>Welcome to School Home Page, a website developed at IIT, Mumbai</p>
+  <h2>Dynamic content</h2>
+  <p>Maharashtra has the following record(school) counts:</p>
+  <ul>
+    <!-- <li><strong>Total School Count:</strong> {{ num_school }}</li>
+    <strong>Only Boys Schools - Count:</strong> {{num_boys_school}}
+    <strong>Only Girls Schools - Count:</strong> {{num_girls_school}}
+    <strong>Coeducation Schools - Count:</strong> {{num_coed_school}}<br> -->
+    <!-- <br>
+    <li><strong> Please Select from drop down list for viewing records of a particular village in a district </strong></li>
+    <br> -->
+    <div id="side-bar" style="background-color: rgba(0, 0, 0, 0.2);">                <!-- side-bar container -->
+
+      <h3 class="text-center">Maharashtra School GIS</h3>
+    <form method="post">
+      {% csrf_token %}
+    <div class="tooltips" title="Please select the District">
+        <strong>District : </strong>{{ dist_name }}
+        <select class='form-control' id="district" name = "dist_select" >
+          <option value="">{{ None }}</option>
+          {% for dist_select in dname %} 
+          <option value = "{{ dist_select.distname }}"
+                  {% if district_selected == dist_select.distname %}
+                      selected="selected"
+                      subdist_select = "None"
+                      village_select = "None"
+                      school_select = "None"
+                      villagecode_select = "None"
+                      schoolcode_select = "None"
+                  {% endif %}
+          >{{ dist_select.distname }}</option>
+            {% endfor %}
+        </select>
+        
+        </div>
+    
+    <br><br>
+    <div class="tooltips" title="Please select the SubDistrict"></div>
+    <strong>Sub District : </strong>
+    <select class='form-control' id="subdistrict" name ="subdist_select">
+      <option value="">{{ None }}</option>
+      {% for subdist_select in bname %}
+      <option value="{{ subdist_select.block_name }}"
+              {% if subdistrict_selected == subdist_select.block_name %}
+                  selected="selected"
+                  village_select = "None"
+                  villagecode_select = "None"
+                  school_select = "None"
+                  schoolcode_select = "None"
+              {% endif %}
+       > {{ subdist_select.block_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+<br><br>
+   <strong>Village : </strong>
+   <select name ="village_select" onChange="form.submit();">
+    <option value="">{{ None }}</option>
+    {% for village_select in vname %}
+    <option value="{{ village_select.village_name }}"
+              {% if village_selected == village_select.village_name %}
+                  selected="selected"
+                  villagecode_select = "None"
+                  school_select = "None"
+                  schoolcode_select = "None"
+              {% endif %}
+    >{{ village_select.village_name }}</option> 
+    {% endfor %}
+  </select>
+
+  <strong>Village Code: </strong>
+   <select name ="villagecode_select" onChange="form.submit();">
+   {% for villagecode_select in vilcod %}
+    <option value="{{ villagecode_select.village_code }}"
+              {% if villagecode_selected == villagecode_select.village_code %}
+                  selected="selected"
+                  school_select = "None"
+                  schoolcode_select = "None"
+              {% endif %}
+    >{{ villagecode_select.village_code }}</option> 
+    {% endfor %}
+  </select>
+<br><br>
+
+  <strong>School : </strong>
+   <select name ="school_select" onChange="form.submit();">
+   <option value="">{{ None }}</option>
+   {% for school_select in sname %}
+   <option value="{{ school_select.school_name }}"
+              {% if school_selected == school_select.school_name %}
+                  selected="selected"
+                  schoolcode_select = 0
+              {% endif %}
+    >{{ school_select.school_name }}</option>
+   {% endfor %}
+ </select>
+
+ <strong>School code: </strong>
+   <select name ="schoolcode_select" onChange="form.submit();">
+   <!-- <option value="">{{ schoolcode_select.school_code }}</option> -->
+   {% for schoolcode_select in schcode %}
+   <option value="{{ schoolcode_select.school_code }}"
+              {% if schoolcode_selected == schoolcode_select.school_code %}
+                  selected="selected"
+                 
+              {% endif %}
+    >{{ schoolcode_select.school_code }}</option>
+   {% endfor %}
+ </select>
+
+
+<!-- <input type="text" name="vilcod" value="{{ schoolcode_selected }}" oninput="form.submit()" > -->
+<br><br> 
+  <!-- <input type="text" name="vilcod" value="{{ vcd }}" oninput="form.submit()" >
+  <input type="text" name="schcod" value="{{ schcd }}" oninput="form.submit()" > -->
+  <!-- <input type="text" name="vilcod" value="{{ vilcod }}" oninput="form.submit()" >
+  <input type="text" name="schcod" value="{{ schcod }}" oninput="form.submit()" > -->
+<!-- <input type= "button" name = "show" value = "Show Chart" onClick="form.submit()"> -->
+<input type = "button" name="Submit" value ="Submit" onClick="form.submit();">
+</form>
+<div margin-left: 30px;>
+ <br><br><table border = '3' style="float: left;">
+  <tr><td>District Code </td><td>{{ dcd }}</td></td></tr>
+  <tr><td>Block Code </td><td>{{ bcd }}</td></td></tr>
+  <tr><td> Village Code </td><td>{{ villagecode_selected   }}</td></td></tr>
+  <tr><td>School Code </td><td>{{ schoolcode_selected }}</td></tr>
+  <tr><td>Village Population </td><td>{{ tot_popu }}</td></td></tr>
+</table></div>
+
+<div><table border = '3' style="float: left;">
+  <tr><td>Village Population </td><td>{{ tot_popu }}</td></tr>
+  <tr><td>No. of Males </td><td>{{ tot_m }}</td></td></tr>
+  <tr><td>No. of Females </td><td>{{ tot_f }}</td></td></tr>
+  <tr><td> Working Males </td><td>{{ tot_work_m }}</td></td></tr>
+  <tr><td>Working Females</td><td>{{ tot_work_f }}</td></td></tr>
+</table></div>
+
+
+
+  <!-- <label for="inputMobile" id="field-label" class="col-lg-3 col-md-3  col-sm-3 col-xs-3 control-label">Subscriber Id:</label> -->
+<div><table border = '3'>
+  <tr><td>School Management </td><td>
+    {% if schmgt == 1 %}{{ schmgt }} -Department of Education 
+    {% elif schmgt == 2 %}{{ schmgt }} -Tribal / Social Welfare Department
+    {% elif schmgt == 3 %}{{ schmgt }} -Local Body 
+    {% elif schmgt == 4 %}{{ schmgt }} -Pvt. aided 
+    {% elif schmgt == 5 %}{{ schmgt }} -Unaided 
+    {% elif schmgt == 6 %}{{ schmgt }} -Others
+    {% elif schmgt == 7 %}{{ schmgt }} -Central Government 
+    {% elif schmgt == 8 %}{{ schmgt }} -Unrecognised
+    {% elif schmgt == 9 %}{{ schmgt }} -Madrasa Recognised 
+    {% elif schmgt ==   10 %}{{ schmgt }} -Madrasa Recognised 
+    {% else %}  Data unavailable {% endif %}
+  </td></tr>
+
+
+  <tr><td>School Category</td><td>
+    {% if schcat == 1 %}{{ schcat }} -Rural
+    {% elif schcat == 2 %}{{ schcat }} -Urban
+    {% else %}  Data unavailable {% endif %}
+  </td></tr>
+  
+  <tr><td>School Type</td><td>
+    {% if schtype == 1 %}{{ schtype }} -Only Boys 
+    {% elif schtype == 2 %}{{ schtype }} -Only Girls
+    {% elif schtype == 3 %}{{ schtype }} -Both (Coeducation)
+    {% else %}  Data unavailable {% endif %}
+  </td></tr>
+  
+  <tr><td> Low Class </td><td>{{ lowclass }}</td></td></tr>
+  <tr><td>High Class</td><td>{{ highclass }}</td></td></tr>
+</table></div>
+    
+    </ul>
+   <!-- <a href = 'village_info.html/{{ vcd }}'>Clcik Me</a> -->
+   
+    {{ request.POST }}
+    <br><br>
+    {{ dist_select }}
+    <br>
+    {{ showchart }}
+
+    <script>
+      let healthFacility,
+          $locate = $('#locate'),
+          $body = $('body'),
+          $findNearest = $('#find-nearest')
+
+
+  $locate.on('click', function(e) {
+          // $status.html('finding your location');
+          if (!navigator.geolocation){
+              alert("<p>Sorry, your browser does not support Geolocation</p>");
+              return;
+          }
+          $body.removeClass('loaded');
+          navigator.geolocation.getCurrentPosition(success, error);
+      });   
+
+      function success(position) {
+      $body.addClass('loaded');
+      var currentPos = [position.coords.latitude,position.coords.longitude];
+      mymap.setView(currentPos, 13);
+      var myLocation = L.marker(currentPos)
+                          .addTo(mymap)
+                          .bindTooltip("Your Location")
+                          .openTooltip();
+      
+      $findNearest.on('click', function(e) {
+              // $status.html('finding your nearest locations')
+              queryFeatures(currentPos, 5);
+              // myLocation.unbindTooltip();
+      });
+  };
+  function error() {
+      alert("Unable to retrieve your location");
+  };
+  function queryFeatures(currentPos, numResults) {
+      var distances = [];
+      healthFacility.eachLayer(function(l) {
+          var distance = L.latLng(currentPos).distanceTo(l.getLatLng())/1000;
+          distances.push(distance);
+      });
+      distances.sort(function(a, b) {
+          return a - b;
+      });
+      var facilityLayer = L.featureGroup();
+      healthFacility.eachLayer(function(l) {
+          var distance = L.latLng(currentPos).distanceTo(l.getLatLng())/1000;
+          if(distance < distances[numResults]) {
+              l.bindTooltip(distance.toLocaleString() + ' km from current location.');
+              L.polyline([currentPos, l.getLatLng()], {
+                  color : 'blue',
+                  weight : 4,
+                  opacity: .5,
+              }).addTo(facilityLayer);
+          }
+      });
+      mymap.flyToBounds(facilityLayer.getBounds(), {duration : 3, easeLinearity: .1 });
+      mymap.on('zoomend', function() {
+          mymap.addLayer(facilityLayer);
+      })
+  }
+
+  let listDistrict = {'AKOLA':['AKOLA',20.7002, 77.0082],'AMRAVATI':['AMRAVATI',20.9374,77.7796],
+  'BULDHANA':['BULDHANA',20.4561,76.3637],'YAVATMAL':['YAVATMAL',20.3888,78.1204],'WASHIM':['WASHIM',20.139,77.1025],
+  'AURANGABAD':['AURANGABAD',19.8762,75.3433],'BEED':['BEED',18.9891,75.7601],'JALNA':['JALNA',19.8297,75.88],
+  'OSMANABAD':['OSMANABAD',18.207,76.1784],'NANDED':['NANDED',19.1383,77.321],'LATUR':['LATUR',18.4088,76.5604],
+  'PARBHANI':['PARBHANI',19.2644,76.6413],'HINGOLI':['HINGOLI',19.5781,77.1025],'THANE':['THANE',19.2183,72.9781],
+  'PALGHAR':['PALGHAR',19.6936,72.7655],'RAIGAD':['RAIGAD',18.5158,73.1822],'RATNAGIRI':['RATNAGIRI',16.9902,73.312],'Sindhudurg':['Sindhudurg',16.3492,73.5594],'Bhandara':['Bhandara',21.0736,79.8297],
+  'GADCHIROLI':['GADCHIROLI',19.4969,80.2767],'CHANDRAPUR':['CHANDRAPUR',19.9615,79.2961],
+  'GONDIA':['GONDIA',21.4624,80.221],'NAGPUR':['NAGPUR',21.1458,79.0882],'WARDHA':['WARDHA',20.7453,78.6022],
+  'AHMEDNAGAR':['AHMEDNAGAR',19.0948,74.748],'DHULE':['DHULE',20.9042,74.7749],'JALGAON':['JALGAON',21.0077,75.5626],
+  'NANDURBAR':['NANDURBAR',21.7469,74.124],'NASHIK':['NASHIK',19.9975,73.7898],'KOLHAPUR':['KOLHAPUR',16.705,74.2433],
+  'PUNE':['PUNE',18.5204,73.8567],'SANGLI':['SANGLI',16.8524,74.5815],'SATARA':['SATARA',17.6805,74.0183],
+  'SOLAPUR':['SOLAPUR',17.6599,74.9064]}
+  
+  let listFacility = {'CHC':'chc_num','PHC':'phc_num'}
+  let url;
+  
+
+
+  function style(feature) {
+  return {
+      fillColor: "#0000",
+      weight: 2,
+      opacity: 1,
+      color: 'black',
+      // dashArray: '3',
+      fillOpacity: 0.7
+  };
+}
+const domain = ['https://makerghat.urbansciences.in/','http://localhost/'];
+var rootUrl = domain[0] + 'geoserver/geonode/ows';
+
+var defaultParameters = {
+  service: 'WFS',
+  version: '1.0.0',
+  request: 'GetFeature',
+  outputFormat: 'json'
+  };
+
+var info = L.control();
+var attribute_table = L.control({position: 'bottomright'});  
+var LayerList = [];
+
+$('#district').on('change',function(){
+  // let dist_select = document.getElementById('district').value;
+  
+  dist_select = document.getElementById('district').value;
+  alert(dist_select);
+
+  // var data = {'dist_select': dist_select};
+  //   $.post(URL, data, function(response){
+  //       if(response === 'success'){ alert('Yay!'); }
+  //       else{ alert('Error! :('); }
+  //   });
+  
+//   $.ajax({
+//     // points to the url where your data will be posted
+//     url:'qb/templates/index.html/$',
+//     // post for security reason
+//     type: "POST",
+//     // data that you will like to return 
+//     data: {dist_select : dist_select},
+//     // what to do when the call is success 
+//     success:function(response){},
+//     // what to do when the call is complete ( you can right your clean from code here)
+//     complete:function(){},
+//     // what to do when there is an error
+//     error:function (xhr, textStatus, thrownError){}
+// });
+})
+
+  // form.submit(dist_select = document.getElementById('district').value);
+
+
+  $('#district').on('click',function(){
+    clear_layer();
+      let district = document.getElementById('district').value;
+      // let lat = listDistrict[district][1];
+      // let long = listDistrict[district][2];
+       tempParameter = defaultParameters;
+     tempParameter.typeName = 'geonode:maha_blocks_30mar'; 
+     tempParameter.propertyName="the_geom";
+       var aspiD = document.getElementById('district').value;
+      
+     var distLayerLatLong= listDistrict[aspiD];
+     console.log(distLayerLatLong);
+    tempParameter.cql_filter = "dtname='"+distLayerLatLong[0]+"'";
+      displayPolygon(tempParameter);
+    // districtlayer = distLayerLatLong[0];
+    mymap.setView([distLayerLatLong[1],distLayerLatLong[2]],9);
+
+      // switch(district){
+      // case 'Akola': url = "https://makerghat.urbansciences.in/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&outputFormat=json&typename=geonode:maha_blocks_30mar&cql_filter=dtname='Akola'&propertyName=the_geom";break;
+      // case 'Amravati': url = "https://makerghat.urbansciences.in/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&outputFormat=json&typename=geonode:maha_blocks_30mar&cql_filter=dtname='Amravati'&propertyName=the_geom";break;
+      // }
+
+  //     mymap.spin(true,{lines: 15, length: 1, width: 50, scale: 200,radius: 200, color: "grey"});
+  //     fetch(url).then(
+  //     function(response) {
+  //     if (response.status !== 200) {
+  //         console.log('Looks like there was a problem. Status Code: ' +
+  //         response.status);
+  //         return;
+  //     }
+  //     response.json().then(function(geojsonData) {
+  //         console.log(geojsonData.features);
+  //         mymap.setView([lat, long], 9);
+  //         geojson = L.geoJson(geojsonData.features, {
+  //         style : style
+  //         // onEachFeature: onEachFeature
+  //     }).addTo(mymap);
+  //         // LayerList.push(geojson);
+  //          mymap.spin(false);
+  //     });
+
+
+  //     }
+  // )
+  // .catch(function(err) {
+  //     console.log('Fetch Error :-S', err);
+  // });
+
+
+  // blockLayer = new L.tileLayer.wms('https://makerghat.urbansciences.in/geoserver/geonode/ows', {
+  //     layers: 'geonode:maha_map_06feb2020',
+  //     format: 'image/png',
+  //     version: '1.3.0',
+  //     transparent: true,
+  // });
+  // console.log(blockLayer);
+  // blockLayer.addTo(mymap);
+
+
+  })
+
+
+
+function displayPolygon(param){
+var parameters = L.Util.extend(param);
+layer_url = rootUrl + L.Util.getParamString(parameters)
+// console.log(layer_url);
+mymap.spin(true,{lines: 9, length: 2, width: 20, scale: 60,radius: 70, color: "grey"});
+
+fetch(layer_url,{mode:'cors'})
+.then(
+  function(response) {
+  if (response.status !== 200) {
+      console.log('Looks like there was a problem. Status Code: ' +
+      response.status);
+      return;
+  }
+
+  // Examine the text in the response
+  response.json().then(function(geojsonData) {
+      // console.log(geojsonData)
+      geojson = L.geoJson(geojsonData.features, {
+      style : style,
+      // onEachFeature: onEachFeature
+  }).addTo(mymap);
+      
+  mymap.spin(false);
+  LayerList.push(geojson);
+
+  });
+
+
+  }
+)
+.catch(function(err) {
+  console.log('Fetch Error :-S', err);
+});
+
+  
+}
+function clear_layer(){
+  LayerList.forEach(layer => mymap.removeLayer(layer));
+  // pointLayerList.forEach(layer => console.log(layer));
+  
+}
+
+function style(feature) {
+  return {
+      weight: 2,
+      opacity: 1,
+      color: "black",
+      fillOpacity: 0
+  };
+}
+
+  function GetSelected() {
+       var selected = new Array();
+       var projectList = document.getElementById("projectList");
+       var chks = projectList.getElementsByTagName("INPUT");
+       for (var i = 0; i < chks.length; i++) {
+           if (chks[i].checked) {
+               selected.push(chks[i].value);
+           }
+       }
+       var geojsonMarkerOptions = {
+          radius: 8,
+          fillColor: "#ff7800",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+      };
+
+      var geojsonMarkerOptions2 = {
+          radius: 5,
+          fillColor: "#007800",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+      };
+
+
+
+
+      selected.forEach(sel => {
+          let newurl =`https://makerghat.urbansciences.in/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&outputFormat=json&typename=geonode:maha_village_health_centroid_29mar&cql_filter=district_n='Akola' AND ${listFacility[sel]}>0`
+          
+          function onEachFeatureForPoint(feature, layer) {
+          if(sel === 'PHC'){
+              layer.bindPopup(`<div class = 'text-center'>PHC<br>
+                              Distance Range: ${feature.properties.phc_distan}<br>
+                              Doctors In Position :${feature.properties.phc_doc_in}<br>
+                              Doctors Total Strength :${feature.properties.phc_doc_nu}<br>
+                              Para Medical Staff Total Strength : ${feature.properties.phc_param_}<br>
+                              Para Medical Staff In Position : ${feature.properties.phc_para_1}fen
+                              </div>`) 
+          }else if(sel === 'CHC'){
+              layer.bindPopup(`<div class = 'text-center'>CHC<br>
+                              Distance Range: ${feature.properties.chc_distan}<br>
+                              Doctors In Position :${feature.properties.chc_doc_in}<br>
+                              Doctors Total Strength :${feature.properties.chc_doc_nu}<br>
+                              Para Medical Staff Total Strength : ${feature.properties.chc_param_}<br>
+                              Para Medical Staff In Position : ${feature.properties.chc_para_1}
+                              </div>`) 
+          }
+          
+          }
+          fetch(newurl).then(
+          function(response) {
+          if (response.status !== 200) {
+              console.log('Looks like there was a problem. Status Code: ' +
+              response.status);
+              return;
+          }
+          response.json().then(function(geojsonData) {
+              console.log(geojsonData.features);
+              healthFacility = L.geoJson(geojsonData.features, {
+                  pointToLayer: function (feature, latlng) {
+                      if(sel === 'CHC')
+                          return L.circleMarker(latlng, geojsonMarkerOptions);
+                      else if(sel === 'PHC')
+                      return L.circleMarker(latlng, geojsonMarkerOptions2);
+
+                  },onEachFeature:onEachFeatureForPoint,
+              }).addTo(mymap);
+          });
+
+
+      }).catch(function(err) {
+              console.log('Fetch Error :-S', err);
+      });
+      })
+      };	
+
+</script>
+
+{% endblock %}

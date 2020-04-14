@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% block title %}<title>Local Library - Maharashtra Schools</title>{% endblock %}
+</head>
+<body>
+  <!-- {% block sidebar %}insert default navigation text for every page{% endblock %} -->
+
+  <h1>Maharashtra School Home Page</h1>
+  <p>Welcome to School Home Page, a website developed at IIT, Mumbai</p>
+  <h2>Dynamic content</h2>
+  <p>Maharashtra has the following record(school) counts:</p>
+  <ul>
+    <!-- <li><strong>Total School Count:</strong> {{ num_school }}</li>
+    <strong>Only Boys Schools - Count:</strong> {{num_boys_school}}
+    <strong>Only Girls Schools - Count:</strong> {{num_girls_school}}
+    <strong>Coeducation Schools - Count:</strong> {{num_coed_school}}<br> -->
+    <!-- <br>
+    <li><strong> Please Select from drop down list for viewing records of a particular village in a district </strong></li>
+    <br> -->
+    <!-- <div id="side-bar" style="background-color: rgba(0, 0, 0, 0.2);">                side-bar container -->
+
+      <h3 class="text-center">Maharashtra School GIS</h3>
+    <form method="post">
+      {% csrf_token %}
+      <strong>District : </strong>{{ dist_name }}
+       <select name ="dist_select" onchange="form.submit();">
+          <option value="">{{ None }}</option>
+          {% for dist_select in dname %} 
+          <option value = "{{ dist_select.distname }}"
+                  {% if district_selected == dist_select.distname %}
+                      selected="selected"
+                      subdist_select = "None"
+                      village_select = "None"
+                      school_select = "None"
+                      villagecode_select = "None"
+                      schoolcode_select = "None"
+                  {% endif %}
+          >{{ dist_select.distname }}</option>
+            {% endfor %}
+        </select>
+
+
+    <strong>Sub District : </strong>
+    <select name ="subdist_select" onchange="form.submit();">
+      <option value="">{{ None }}</option>
+      {% for subdist_select in bname %}
+      <option value="{{ subdist_select.block_name }}"
+              {% if subdistrict_selected == subdist_select.block_name %}
+                  selected="selected"
+                  village_select = "None"
+                  villagecode_select = "None"
+                  school_select = "None"
+                  schoolcode_select = "None"
+              {% endif %}
+       > {{ subdist_select.block_name }}</option>
+      {% endfor %}
+    </select>
+
+<br><br>
+   <strong>Village : </strong>
+   <select name ="village_select" onChange="form.submit();">
+    <option value="">{{ None }}</option>
+    {% for village_select in vname %}
+    <option value="{{ village_select.village_name }}"
+              {% if village_selected == village_select.village_name %}
+                  selected="selected"
+                  villagecode_select = "None"
+                  school_select = "None"
+                  schoolcode_select = "None"
+              {% endif %}
+    >{{ village_select.village_name }}</option> 
+    {% endfor %}
+  </select>
+
+  <strong>Village Code: </strong>
+   <select name ="villagecode_select" onChange="form.submit();">
+   {% for villagecode_select in vilcod %}
+    <option value="{{ villagecode_select.village_code }}"
+              {% if villagecode_selected == villagecode_select.village_code %}
+                  selected="selected"
+                  school_select = "None"
+                  schoolcode_select = "None"
+              {% endif %}
+    >{{ villagecode_select.village_code }}</option> 
+    {% endfor %}
+  </select>
+<br><br>
+
+  <strong>School : </strong>
+   <select name ="school_select" onChange="form.submit();">
+   <option value="">{{ None }}</option>
+   {% for school_select in sname %}
+   <option value="{{ school_select.school_name }}"
+              {% if school_selected == school_select.school_name %}
+                  selected="selected"
+                  schoolcode_select = 0
+              {% endif %}
+    >{{ school_select.school_name }}</option>
+   {% endfor %}
+ </select>
+
+ <strong>School code: </strong>
+   <select name ="schoolcode_select" onChange="form.submit();">
+   <!-- <option value="">{{ schoolcode_select.school_code }}</option> -->
+   {% for schoolcode_select in schcode %}
+   <option value="{{ schoolcode_select.school_code }}"
+              {% if schoolcode_selected == schoolcode_select.school_code %}
+                  selected="selected"
+                 
+              {% endif %}
+    >{{ schoolcode_select.school_code }}</option>
+   {% endfor %}
+ </select>
+
+
+<!-- <input type="text" name="vilcod" value="{{ schoolcode_selected }}" oninput="form.submit()" > -->
+<br><br> 
+  <!-- <input type="text" name="vilcod" value="{{ vcd }}" oninput="form.submit()" >
+  <input type="text" name="schcod" value="{{ schcd }}" oninput="form.submit()" > -->
+  <!-- <input type="text" name="vilcod" value="{{ vilcod }}" oninput="form.submit()" >
+  <input type="text" name="schcod" value="{{ schcod }}" oninput="form.submit()" > -->
+<!-- <input type= "button" name = "show" value = "Show Chart" onClick="form.submit()"> -->
+<input type = "button" name="Submit" value ="Submit" onClick="form.submit();">
+</form>
+<div margin-left: 30px;>
+ <br><br><table border = '3' style="float: left;">
+  <tr><td>District Code </td><td>{{ dcd }}</td></td></tr>
+  <tr><td>Block Code </td><td>{{ bcd }}</td></td></tr>
+  <tr><td> Village Code </td><td>{{ villagecode_selected   }}</td></td></tr>
+  <tr><td>School Code </td><td>{{ schoolcode_selected }}</td></tr>
+  <tr><td>Village Population </td><td>{{ tot_popu }}</td></td></tr>
+</table></div>
+
+<div><table border = '3' style="float: left;">
+  <tr><td>Village Population </td><td>{{ tot_popu }}</td></tr>
+  <tr><td>No. of Males </td><td>{{ tot_m }}</td></td></tr>
+  <tr><td>No. of Females </td><td>{{ tot_f }}</td></td></tr>
+  <tr><td> Working Males </td><td>{{ tot_work_m }}</td></td></tr>
+  <tr><td>Working Females</td><td>{{ tot_work_f }}</td></td></tr>
+</table></div>
+
+
+
+  <!-- <label for="inputMobile" id="field-label" class="col-lg-3 col-md-3  col-sm-3 col-xs-3 control-label">Subscriber Id:</label> -->
+<div><table border = '3'>
+  <tr><td>School Management </td><td>
+    {% if schmgt == 1 %}{{ schmgt }} -Department of Education 
+    {% elif schmgt == 2 %}{{ schmgt }} -Tribal / Social Welfare Department
+    {% elif schmgt == 3 %}{{ schmgt }} -Local Body 
+    {% elif schmgt == 4 %}{{ schmgt }} -Pvt. aided 
+    {% elif schmgt == 5 %}{{ schmgt }} -Unaided 
+    {% elif schmgt == 6 %}{{ schmgt }} -Others
+    {% elif schmgt == 7 %}{{ schmgt }} -Central Government 
+    {% elif schmgt == 8 %}{{ schmgt }} -Unrecognised
+    {% elif schmgt == 9 %}{{ schmgt }} -Madrasa Recognised 
+    {% elif schmgt ==   10 %}{{ schmgt }} -Madrasa Recognised 
+    {% else %}  Data unavailable {% endif %}
+  </td></tr>
+
+
+  <tr><td>School Category</td><td>
+    {% if schcat == 1 %}{{ schcat }} -Rural
+    {% elif schcat == 2 %}{{ schcat }} -Urban
+    {% else %}  Data unavailable {% endif %}
+  </td></tr>
+  
+  <tr><td>School Type</td><td>
+    {% if schtype == 1 %}{{ schtype }} -Only Boys 
+    {% elif schtype == 2 %}{{ schtype }} -Only Girls
+    {% elif schtype == 3 %}{{ schtype }} -Both (Coeducation)
+    {% else %}  Data unavailable {% endif %}
+  </td></tr>
+  
+  <tr><td> Low Class </td><td>{{ lowclass }}</td></td></tr>
+  <tr><td>High Class</td><td>{{ highclass }}</td></td></tr>
+</table></div>
+    
+    </ul>
+   <!-- <a href = 'village_info.html/{{ vcd }}'>Clcik Me</a> -->
+   
+    {{ request.POST }}
+    <br><br>
+    {{ dist_select }}
+    <br>
+    {{ showchart }}
