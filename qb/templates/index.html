@@ -174,7 +174,7 @@
    {% endfor %}
  </select>
 </div>
-<div class="tooltips" title="Please select the SubDistrict">
+<div class="tooltips">
  <strong>School code: </strong>
    <select class='form-control' id ="schoolcode_select" name ="schoolcode_select" onChange="form.submit();">
    <!-- <option value="">{{ schoolcode_select.school_code }}</option> -->
@@ -188,15 +188,23 @@
    {% endfor %}
  </select>
 </div>
-
-<!-- <input type="text" name="vilcod" value="{{ schoolcode_selected }}" oninput="form.submit()" > -->
+<div class="tooltips">
+ <strong>Pincode </strong>
+   <select class='form-control' id ="pincode" name ="pincode" onChange="form.submit();">
+   <!-- <option value="">{{ schoolcode_select.school_code }}</option> -->
+   {% for pincode_select in pincode %}
+   <option value="{{ pincode_select.pincode }}"
+              {% if pincode_selected == pincode_select.pincode%}
+                  selected="selected"
+                 
+              {% endif %}
+    >{{ pincode_select.pincode }}</option>
+   {% endfor %}
+ </select>
+</div>
 <br><br> 
-  <!-- <input type="text" name="vilcod" value="{{ vcd }}" oninput="form.submit()" >
-  <input type="text" name="schcod" value="{{ schcd }}" oninput="form.submit()" > -->
-  <!-- <input type="text" name="vilcod" value="{{ vilcod }}" oninput="form.submit()" >
-  <input type="text" name="schcod" value="{{ schcod }}" oninput="form.submit()" > -->
-<!-- <input type= "button" name = "show" value = "Show Chart" onClick="form.submit()"> -->
-<input type = "button" id ="submit" name="Submit" value ="Submit" onClick="form.submit();">
+  
+<!-- <input type = "button" id ="submit" name="Submit" value ="Submit" onClick="form.submit();"> -->
 </form>
 
 <div margin-left: 30px;>
@@ -205,7 +213,7 @@
      <tr><td width="70%">District Code </td><td>{{ dcd }}</td></td></tr>
      <tr><td width="70%">Block Code </td><td>{{ bcd }}</td></td></tr>
      <tr><td width="70%"> Village Code </td><td>{{ villagecode_selected   }}</td></td></tr>
-     <tr><td width="70%">School Code </td><td>{{ schoolcode_selected }}</td></tr>
+     <!-- <tr><td width="70%">School Code </td><td>{{ schoolcode_selected }}</td></tr> -->
    
      <tr><th colspan="2">Village People Information</th></tr>
      <tr><td>Village Population </td><td>{{ tot_popu }}</td></td></tr>
@@ -248,7 +256,8 @@
    </table></div>    </ul>
    <!-- <a href = 'village_info.html/{{ vcd }}'>Clcik Me</a> -->
    
-    <!-- {{ request.POST }} -->
+    {{ request.POST }}
+    {{ request.POST.schcode }}
     <br><br>
   
     <script>
@@ -357,7 +366,7 @@ var defaultParameters = {
     var pointLayerList = [];
     var searchControl;
 
-$('#submit').on('click',function(){
+$('#district').on('click',function(){
     clear_layer();
     clearpoint_layer();
 
