@@ -35,30 +35,15 @@ def index(request):
     schcd_selected = None
     villagecode_selected =None
     schoolcode_selected =None
+    schcode = None
+    schcategory = None
 
-    # schcd = 0
-    # dcd = 0
-    # bcd =0
-    # vcd=0
-    # toal_popu =0
-    # tot_m = 0
-    # tot_f = 0
-    # tot_work_f = 0
-    # tot_work_m =0
-    # vilcod=0
-    # schcod=0
-    # schmgt =0
-    
-    
     num_school = School1617Codes.objects.all().count()
-    # schoolgen = SchoolGeneral1617.objects.all()
-    # mahaddwgen = MahaDdw.objects.all()
     num_boys_school = SchoolGeneral1617.objects.filter(schtype='1').count()
     num_girls_school= SchoolGeneral1617.objects.filter(schtype='2').count()
     num_coed_school= SchoolGeneral1617.objects.filter(schtype='3').count()
     dname = School1617Codes.objects.order_by('distname').values('distname').distinct()
-
-    # bname= School1617Codes.objects.filter(distname=district_selected).distinct('block_name')
+    bname= School1617Codes.objects.filter(distname=district_selected).distinct('block_name')
 
     if request.method == "POST":
         district_selected = None
@@ -87,6 +72,7 @@ def index(request):
       
         
     context = {
+            'request.session':request.session,
             'num_school': num_school,
             'num_boys_school':num_boys_school,
             'num_girls_school':num_girls_school,
@@ -99,24 +85,28 @@ def index(request):
             'sname' : School1617Codes.objects.filter(village_name=village_selected).filter(block_name=subdistrict_selected).filter(distname=district_selected).distinct('school_name'),
             'vilcod' : School1617Codes.objects.filter(village_name=village_selected).filter(block_name=subdistrict_selected).filter(distname=district_selected).distinct('village_code'),
             'schcode' : School1617Codes.objects.filter(school_name=school_selected).filter(village_name=village_selected).filter(block_name=subdistrict_selected).filter(distname=district_selected).distinct('school_code'),
-                   
+            'pincode' : School1617Codes.objects.filter(school_name=school_selected).filter(village_name=village_selected).filter(block_name=subdistrict_selected).filter(distname=district_selected).distinct('pincode'),
+
             'district_selected':district_selected,
             'subdistrict_selected':subdistrict_selected,
             'village_selected':village_selected,
             'school_selected':school_selected,
             'villagecode_selected':villagecode_selected,
             'schoolcode_selected':schoolcode_selected,
+            'schcategory':schcategory,
+
+            #  'object_list': schoolcode_selected,
             # 'showchart':showchart,
             
         
-            # 'dcd':School1617Codes.objects.values_list('district_code',flat=True).get(school_name=school_selected,village_name=village_selected,block_name=subdistrict_selected,distname=district_selected),
-            # 'bcd':School1617Codes.objects.values_list('block_code',flat=True).get(school_name=school_selected,village_name=village_selected,block_name=subdistrict_selected,distname=district_selected),
+            'dcd':School1617Codes.objects.values_list('district_code',flat=True).get(school_name=school_selected,village_name=village_selected,block_name=subdistrict_selected,distname=district_selected),
+            'bcd':School1617Codes.objects.values_list('block_code',flat=True).get(school_name=school_selected,village_name=village_selected,block_name=subdistrict_selected,distname=district_selected),
                
-            # 'tot_popu':MahaDdw.objects.values_list('tot_p',flat=True).get(census_2011code=villagecode_selected),
-            # 'tot_m':MahaDdw.objects.values_list('tot_m',flat=True).get(census_2011code=villagecode_selected),
-            # 'tot_f':MahaDdw.objects.values_list('tot_f',flat=True).get(census_2011code=villagecode_selected),
-            # 'tot_work_m':MahaDdw.objects.values_list('tot_work_m',flat=True).get(census_2011code=villagecode_selected),
-            # 'tot_work_f':MahaDdw.objects.values_list('tot_work_f',flat=True).get(census_2011code=villagecode_selected),
+            'tot_popu':MahaDdw.objects.values_list('tot_p',flat=True).get(census_2011code=villagecode_selected),
+            'tot_m':MahaDdw.objects.values_list('tot_m',flat=True).get(census_2011code=villagecode_selected),
+            'tot_f':MahaDdw.objects.values_list('tot_f',flat=True).get(census_2011code=villagecode_selected),
+            'tot_work_m':MahaDdw.objects.values_list('tot_work_m',flat=True).get(census_2011code=villagecode_selected),
+            'tot_work_f':MahaDdw.objects.values_list('tot_work_f',flat=True).get(census_2011code=villagecode_selected),
               
             # 'schmgt':SchoolGeneral1617.objects.values_list('schmgt',flat=True).get(schcd=schoolcode_selected),
             # 'schcat':SchoolGeneral1617.objects.values_list('schcat',flat=True).get(schcd=schoolcode_selected),
